@@ -9,37 +9,65 @@ import { AppUI } from "./AppUI";
 //   { text: 'Llorar con la llorona', completed:false },
 //   { text: 'LALALALAA', completed:false },
 // ];
+// localStorage.setItem('TODOS_V1', JSON.stringify(defaultTodos))
+// localStorage.getItem('TODOS_V1')
 
-function useLocalStorage (itemName, initialValue){
+function useLocalStorage (itemName, initialValue){ 
+  const [error, setError] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [item, setItem] = React.useState(initialValue);
   
+  React.useEffect(() => {
+    setTimeout(()=> {
+      try {
+          const localStorageItem = localStorage.getItem(itemName);
+          let parsedItem;
+          
+          
+          if (!localStorageItem){
+            localStorage.setItem(itemName, JSON.stringify(initialValue));
+            parsedItem = initialValue; 
+          }else{
+            parsedItem = JSON.parse(localStorageItem)
+          }
+          setItem (parsedItem);
+          
+      } catch (error) {
+        setError(error)
+      } finally{
+        setLoading(false);
+      }
+    },1000);
+  });  
 
-  const localStorageItem = localStorage.getItem(itemName);
-  let parsedItem;
-  
-  
-  if (!localStorageItem){
-    localStorage.setItem(itemName, JSON.stringify(initialValue));
-    parsedItem = initialValue; 
-  }else{
-  parsedItem = JSON.parse(localStorageItem)
-  }
-  const [item, setItem] = React.useState(parsedItem);
 
   const saveItem = (newItem) => {
-    const stringifiedItem = JSON.stringify(newItem);
+    try {
+      const stringifiedItem = JSON.stringify(newItem);
     localStorage.setItem(itemName, stringifiedItem);
     setItem(newItem);
+    } catch (error) {
+      setError(error)
+    }
   };
 
-  return [
+  return {
     item,
     saveItem,
-  ];
+    loading,
+    error,
+  };
 }
 
 
 function App() {
- const [todos , saveTodos] = useLocalStorage('TODOS_V1', [])
+
+ const {
+  item: todos,
+  saveItem: saveTodos,
+  loading,
+  error,
+ }= useLocalStorage('TODOS_V1', [])
 //  const [name , saveNAme] = useLocalStorage('nombreImportante','')
   const [searchValue, setSearchValue] = React.useState('');
 
@@ -77,8 +105,19 @@ function App() {
     saveTodos(newTodos);
     };
 
+    // console.log('Render antes del use Effect');
+
+    // React.useEffect(() => {
+    //   console.log('use Effect');
+    // }, [totalTodos])
+
+    // console.log('Render despues del use Effect');
+
+
   return (
     <AppUI 
+    loading= {loading}
+    error = {error}
     totalTodos = {totalTodos}
     completedTodos = {completedTodos}
     searchValue={searchValue}
