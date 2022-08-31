@@ -1,0 +1,27 @@
+Antes de React 18 
+    const root = document.getElementById('root');
+    ReactDOM.render(e(LikeButton), root);
+
+Desde React 18 
+    const rootElement = document.getElementById('root');
+    const root = ReactDom.createRoot(rootElement);
+    root.render(e(LikeButton));
+
+
+Antes de React 18  
+    ReactDOM.render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>,
+    document.getElementById('root')
+    );
+
+Despues de React 18
+    const rootElement = document.getElementById('root');
+    const root = ReactDom.createRoot(rootElement);
+
+    root.render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+    );
